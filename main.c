@@ -1,5 +1,6 @@
 #include <pocketsphinx.h>
-#include <SWI-Prolog.h>
+#include <assert.h>
+#include "prolog.h"
 
 #define MODELDIR "/opt/sphinx/share/pocketsphinx/model"
 
@@ -13,13 +14,11 @@ main(int argc, char *argv[])
     int16 buf[512];
     int rv;
     int32 score;
-
+    assert(init_prolog(argc, argv));
     config = cmd_ln_init(NULL, ps_args(), TRUE,
 		         "-hmm", MODELDIR "/en-us/en-us",
-			 "-lm", "3471.lm",
-	    		 "-dict", "3471.dic",
-			 //"-lm", MODELDIR "/en-us/en-us.lm.bin",
-	    		 //"-dict", MODELDIR "/en-us/cmudict-en-us.dict",
+			 "-lm", "3203.lm",
+	    		 "-dict", "3203.dic",
 		         NULL);
     if (config == NULL) {
 	fprintf(stderr, "Failed to create config object, see log for details\n");
@@ -49,7 +48,7 @@ main(int argc, char *argv[])
     rv = ps_end_utt(ps);
     hyp = ps_get_hyp(ps, &score);
     printf("Recognized: %s\n", hyp);
-
+    effect_request(hyp);
     fclose(fh);
     ps_free(ps);
     cmd_ln_free_r(config);
