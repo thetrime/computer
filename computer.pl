@@ -1,8 +1,8 @@
 % Helpful hints
 % https://sourceforge.net/p/cmusphinx/discussion/help/thread/61e35142/
 
-/* Major tasks:c
-   * Downcase keywords for ease of parsing by Prolog
+/* Major tasks:
+
 */
 
 :-module(computer,
@@ -12,7 +12,7 @@
 
 computer:-
 	on_signal(term, _, halt),
-	wait_for_keyword('COMPUTER'),
+	wait_for_keyword(computer),
 	listen_for_utterance(UtteranceTokens, Confidence),
 	writeln(Confidence),
 	parse_utterance(UtteranceTokens, Command),

@@ -1,6 +1,7 @@
 #include <pocketsphinx.h>
 #include <sphinxbase/ad.h>
 #include <assert.h>
+#include <ctype.h>
 #include <SWI-Prolog.h>
 #include <SWI-Stream.h>
 
@@ -27,12 +28,22 @@ int tokenize(const char* input, term_t Tokens)
    term_t list = PL_copy_term_ref(Tokens);
    term_t item = PL_new_term_ref();
    const char* base = input;
+   char *p, *q;
+   char lcbuf[256];
    int i = 0;
+   int j = 0;
    while (1)
    {
       if (base[i] == ' ' || base[i] == 0)
       {
-	 if (!PL_unify_list(list, item, list) || !PL_unify_atom_nchars(item, i, (char*)base))
+	 if (!PL_unify_list(list, item, list))
+	    return 0;
+	 // Downcase the string
+	 assert(i < 256);
+	 for (j = 0; j < i; j++)
+	    lcbuf[j] = tolower(base[j]);
+	 // Then unify it
+	 if (!PL_unify_atom_nchars(item, i, lcbuf))
 	    return 0;
 	 if (base[i] == 0)
 	    break;
@@ -64,7 +75,7 @@ foreign_t wait_for_keyword(term_t Keyword)
       }
       ps_process_raw(ps, buffer, bytes_read, FALSE, FALSE);
       const char* hypothesis = ps_get_hyp(ps, &score);
-      if (hypothesis != NULL && strcmp(hypothesis, keyword) == 0)
+      if (hypothesis != NULL && strcasecmp(hypothesis, keyword) == 0)
       {
            ps_end_utt(ps);
 	   Sdprintf("*** Keyword detected!\n");
@@ -106,7 +117,7 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
    }
    rv = ps_end_utt(ps);
    hypothesis = ps_get_hyp(ps, &score);
-   Sdprintf("*** utterance detected. Tokenizing...\n");   
+   Sdprintf("*** utterance detected. Tokenizing...\n");
    rc = tokenize(hypothesis, Tokens);
    Sdprintf("*** tokenzied!\n");
    return PL_unify_integer(Score, score);
