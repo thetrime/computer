@@ -5,7 +5,7 @@
 #include <SWI-Stream.h>
 
 #define MODELDIR "/opt/sphinx/share/pocketsphinx/model"
-#define MODEL "1698"
+#define MODEL "computer"
 #define BUFSIZE 2048
 
 static ps_decoder_t *ps = NULL;

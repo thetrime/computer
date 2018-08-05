@@ -1,11 +1,12 @@
-WHAT IS THE TIME
-WHAT IS THE WEATHER LIKE
-WHAT IS THE WEATHER TOMORROW
-WHAT IS THE TEMPERATURE OUTSIDE
-ADD ONIONS TO THE SHOPPING LIST
-ADD MILK TO THE SHOPPING LIST
-CLEAN THE HOUSE
-VACUUM THE HOUSE
-TELL ME A JOKE
-WHAT TIME IS IT
-STOP CLEANING THE HOUSE
+computer
+what is the time
+what is the weather like
+what is the weather tomorrow
+what is the temperature outside
+add onions to the shopping list
+add milk to the shopping list
+clean the house
+vacuum the house
+tell me a joke
+what time is it
+stop cleaning the house

@@ -1,4 +1,4 @@
-Language model created by QuickLM on Sat Jul 28 12:52:17 EDT 2018
+Language model created by QuickLM on Sun Aug  5 08:42:12 EDT 2018
 Copyright (c) 1996-2010 Carnegie Mellon University and Alexander I. Rudnicky
 
 The model is in standard ARPA format, designed by Doug Paul while he was at MITRE.
@@ -7,54 +7,57 @@ The code that was used to produce this language model is available in Open Sourc
 Please visit http://www.speech.cs.cmu.edu/tools/ for more information
 
 The (fixed) discount mass is 0.5. The backoffs are computed using the ratio method.
-This model based on a corpus of 11 sentences and 27 words
+This model based on a corpus of 12 sentences and 28 words
 
 \data\
-ngram 1=27
-ngram 2=40
-ngram 3=37
+ngram 1=28
+ngram 2=42
+ngram 3=38
 
 \1-grams:
--1.1109 </s> -0.3010
--1.1109 <s> -0.2660
--2.1523 A -0.2980
--1.8513 ADD -0.2949
--2.1523 CLEAN -0.2726
--2.1523 CLEANING -0.2726
--1.6752 HOUSE -0.2660
--1.4533 IS -0.2693
--2.1523 IT -0.2660
--2.1523 JOKE -0.2660
--2.1523 LIKE -0.2660
--1.8513 LIST -0.2660
--2.1523 ME -0.2980
--2.1523 MILK -0.2949
--2.1523 ONIONS -0.2949
--2.1523 OUTSIDE -0.2660
--1.8513 SHOPPING -0.2949
--2.1523 STOP -0.2980
--2.1523 TELL -0.2980
--2.1523 TEMPERATURE -0.2980
--1.1980 THE -0.2693
--1.8513 TIME -0.2491
--1.8513 TO -0.2726
--2.1523 TOMORROW -0.2660
--2.1523 VACUUM -0.2726
--1.8513 WEATHER -0.2949
--1.4533 WHAT -0.2791
+-1.0911 </s> -0.3010
+-1.0911 <s> -0.2643
+-2.1703 A -0.2981
+-1.8692 ADD -0.2951
+-2.1703 CLEAN -0.2738
+-2.1703 CLEANING -0.2738
+-2.1703 COMPUTER -0.2643
+-1.6931 HOUSE -0.2643
+-1.4713 IS -0.2706
+-2.1703 IT -0.2643
+-2.1703 JOKE -0.2643
+-2.1703 LIKE -0.2643
+-1.8692 LIST -0.2643
+-2.1703 ME -0.2981
+-2.1703 MILK -0.2951
+-2.1703 ONIONS -0.2951
+-2.1703 OUTSIDE -0.2643
+-1.8692 SHOPPING -0.2951
+-2.1703 STOP -0.2981
+-2.1703 TELL -0.2981
+-2.1703 TEMPERATURE -0.2981
+-1.2160 THE -0.2706
+-1.8692 TIME -0.2480
+-1.8692 TO -0.2738
+-2.1703 TOMORROW -0.2643
+-2.1703 VACUUM -0.2738
+-1.8692 WEATHER -0.2951
+-1.4713 WHAT -0.2800
 
 \2-grams:
--1.0414 <s> ADD 0.0000
--1.3424 <s> CLEAN 0.0000
--1.3424 <s> STOP 0.0000
--1.3424 <s> TELL 0.0000
--1.3424 <s> VACUUM 0.0000
--0.6435 <s> WHAT 0.0000
+-1.0792 <s> ADD 0.0000
+-1.3802 <s> CLEAN 0.0000
+-1.3802 <s> COMPUTER 0.0000
+-1.3802 <s> STOP 0.0000
+-1.3802 <s> TELL 0.0000
+-1.3802 <s> VACUUM 0.0000
+-0.6812 <s> WHAT 0.0000
 -0.3010 A JOKE 0.0000
 -0.6021 ADD MILK 0.0000
 -0.6021 ADD ONIONS 0.0000
 -0.3010 CLEAN THE -0.2218
 -0.3010 CLEANING THE -0.2218
+-0.3010 COMPUTER </s> -0.3010
 -0.3010 HOUSE </s> -0.3010
 -1.0000 IS IT 0.0000
 -0.3979 IS THE -0.1919
@@ -89,6 +92,7 @@ ngram 3=37
 -0.6021 <s> ADD MILK
 -0.6021 <s> ADD ONIONS
 -0.3010 <s> CLEAN THE
+-0.3010 <s> COMPUTER </s>
 -0.3010 <s> STOP CLEANING
 -0.3010 <s> TELL ME
 -0.3010 <s> VACUUM THE

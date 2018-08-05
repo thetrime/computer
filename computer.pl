@@ -1,8 +1,7 @@
 % Helpful hints
 % https://sourceforge.net/p/cmusphinx/discussion/help/thread/61e35142/
 
-/* Major tasks:
-   * Process corpus to language file at make time
+/* Major tasks:c
    * Downcase keywords for ease of parsing by Prolog
 */
 
