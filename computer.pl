@@ -2,7 +2,6 @@
 % https://sourceforge.net/p/cmusphinx/discussion/help/thread/61e35142/
 
 /* Major tasks:
-   * Read from the microphone
    * Process corpus to language file at make time
    * Downcase keywords for ease of parsing by Prolog
 */
@@ -13,6 +12,7 @@
 :-use_foreign_library(sphinx).
 
 computer:-
+	on_signal(term, _, halt),
 	wait_for_keyword('COMPUTER'),
 	listen_for_utterance(UtteranceTokens, Confidence),
 	writeln(Confidence),
