@@ -7,7 +7,7 @@
 
 #define MODELDIR "/opt/sphinx/share/pocketsphinx/model"
 #define MODEL "computer"
-#define BUFSIZE 2048
+#define BUFSIZE 8192
 
 static ps_decoder_t *ps = NULL;
 ad_rec_t *microphone = NULL;
@@ -57,7 +57,7 @@ int tokenize(const char* input, term_t Tokens)
 
 foreign_t wait_for_keyword(term_t Keyword)
 {
-   int16 buffer[2048];
+   int16 buffer[BUFSIZE];
    char* keyword;
    int32 score;
    assert(PL_get_atom_chars(Keyword, &keyword));
@@ -66,13 +66,15 @@ foreign_t wait_for_keyword(term_t Keyword)
    Sdprintf("Ready!\n");
    while (1)
    {
-      int32 bytes_read = ad_read(microphone, buffer, 2048);
+      int32 bytes_read = ad_read(microphone, buffer, BUFSIZE);
       assert(bytes_read >= 0);
+      /*
       if (bytes_read == 0)
       {
-	 sleep_msec(200);
+	 //sleep_msec(200);
 	 continue;
       }
+      */
       ps_process_raw(ps, buffer, bytes_read, FALSE, FALSE);
       const char* hypothesis = ps_get_hyp(ps, &score);
       if (hypothesis != NULL && strcasecmp(hypothesis, keyword) == 0)
@@ -81,7 +83,8 @@ foreign_t wait_for_keyword(term_t Keyword)
 	   Sdprintf("*** Keyword detected!\n");
 	   PL_succeed;
       }
-      Sdprintf("Heard something, but it was not %s\n", keyword);
+      //Sdprintf("Heard something in those %d bytes, but it was not %s (%s)\n", bytes_read, keyword, hypothesis);
+      sleep_msec(10);
    }
    // End of buffer but no keyword detected
    Sdprintf("failed to find keyword\n");
@@ -90,7 +93,7 @@ foreign_t wait_for_keyword(term_t Keyword)
 
 foreign_t listen_for_utterance(term_t Tokens, term_t Score)
 {
-   int16 buffer[2048];
+   int16 buffer[BUFSIZE];
    char const *hypothesis;
    int32 score;
    int rc;
@@ -99,7 +102,7 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
    int started_speaking = 0;
    while (1)
    {
-      int32 bytes_read = ad_read(microphone, buffer, 2048);
+      int32 bytes_read = ad_read(microphone, buffer, BUFSIZE);
       assert(bytes_read >= 0);
       rv = ps_process_raw(ps, buffer, bytes_read, FALSE, FALSE);
       int is_speaking_now = ps_get_in_speech(ps);
@@ -113,7 +116,7 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
 	 // Looks like that is it!
 	 break;
       }
-      sleep_msec(100);
+      //sleep_msec(100);
    }
    rv = ps_end_utt(ps);
    hypothesis = ps_get_hyp(ps, &score);
@@ -135,7 +138,7 @@ install_t install_sphinx()
 //			"-lm", MODEL ".lm",
 			"-dict", MODEL ".dic",
 //			"-kws", "computer",
-//			"-kws_threshold", "1e-5",
+			"-kws_threshold", "1e-80",
 			NULL);
    assert(config != NULL);
 
