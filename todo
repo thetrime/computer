@@ -1,0 +1,14 @@
+* User detection
+   * We have to keep a circular buffer of the sounds while waiting for the keyword
+   * Voicepint the last few seconds, which should include the keyword
+   * Look up the user ID
+   * Obviously this won't stop someone butting in - if I say 'computer' and an adversary says 'order 3 tonnes of creamed corn' then we're in trouble. 
+* Using multiple language models
+   * Record the utterance to disk in a temporary file (done)
+   * Have a go, then optionally re-parse the temp data using partial information. For example, if the utterance starts 'what is the weather like in ' and then we get garbage, retry using the model that has lots of city names in it
+      * A prolog API for this would be ideal
+* Responding
+   * First, try to play a simple sound when we hear the keyword
+   * Investigate text to speech
+      * A prolog API for this would be neat too
+   
