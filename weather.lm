@@ -1,0 +1,77 @@
+Language model created by QuickLM on Wed Aug 15 11:49:37 EDT 2018
+Copyright (c) 1996-2010 Carnegie Mellon University and Alexander I. Rudnicky
+
+The model is in standard ARPA format, designed by Doug Paul while he was at MITRE.
+
+The code that was used to produce this language model is available in Open Source.
+Please visit http://www.speech.cs.cmu.edu/tools/ for more information
+
+The (fixed) discount mass is 0.5. The backoffs are computed using the ratio method.
+This model based on a corpus of 7 sentences and 16 words
+
+\data\
+ngram 1=16
+ngram 2=21
+ngram 3=17
+
+\1-grams:
+-1.1187 </s> -0.3010
+-1.1187 <s> -0.2667
+-1.9638 ANDREWS -0.2667
+-1.9638 CUPARS -0.2667
+-1.9638 DUNDEE -0.2667
+-1.9638 EDINBURGH -0.2667
+-1.9638 GLASGOW -0.2667
+-1.3617 IN -0.2817
+-1.3617 IS -0.2817
+-1.9638 KINROSS -0.2667
+-1.3617 LIKE -0.2817
+-1.9638 LONDON -0.2667
+-1.9638 SAINT -0.2963
+-1.3617 THE -0.2817
+-1.3617 WEATHER -0.2817
+-1.3617 WHAT -0.2817
+
+\2-grams:
+-1.1461 <s> CUPARS 0.0000
+-1.1461 <s> KINROSS 0.0000
+-1.1461 <s> SAINT 0.0000
+-0.5441 <s> WHAT 0.0000
+-0.3010 ANDREWS </s> -0.3010
+-0.3010 CUPARS </s> -0.3010
+-0.3010 DUNDEE </s> -0.3010
+-0.3010 EDINBURGH </s> -0.3010
+-0.3010 GLASGOW </s> -0.3010
+-0.9031 IN DUNDEE 0.0000
+-0.9031 IN EDINBURGH 0.0000
+-0.9031 IN GLASGOW 0.0000
+-0.9031 IN LONDON 0.0000
+-0.3010 IS THE 0.0000
+-0.3010 KINROSS </s> -0.3010
+-0.3010 LIKE IN 0.0000
+-0.3010 LONDON </s> -0.3010
+-0.3010 SAINT ANDREWS 0.0000
+-0.3010 THE WEATHER 0.0000
+-0.3010 WEATHER LIKE 0.0000
+-0.3010 WHAT IS 0.0000
+
+\3-grams:
+-0.3010 <s> CUPARS </s>
+-0.3010 <s> KINROSS </s>
+-0.3010 <s> SAINT ANDREWS
+-0.3010 <s> WHAT IS
+-0.3010 IN DUNDEE </s>
+-0.3010 IN EDINBURGH </s>
+-0.3010 IN GLASGOW </s>
+-0.3010 IN LONDON </s>
+-0.3010 IS THE WEATHER
+-0.9031 LIKE IN DUNDEE
+-0.9031 LIKE IN EDINBURGH
+-0.9031 LIKE IN GLASGOW
+-0.9031 LIKE IN LONDON
+-0.3010 SAINT ANDREWS </s>
+-0.3010 THE WEATHER LIKE
+-0.3010 WEATHER LIKE IN
+-0.3010 WHAT IS THE
+
+\end\

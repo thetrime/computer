@@ -13,7 +13,7 @@
 
 computer:-
 	on_signal(term, _, halt),
-	init_sphinx(computer, computer, 1e-20),
+	init_sphinx(default, computer, 1e-30),
 	main_loop.
 
 main_loop:-
@@ -25,6 +25,13 @@ main_loop:-
 	parse_utterance(UtteranceTokens, Command),
 	effect_command(Command),
 	main_loop.
+
+effect_command(parse_tree([what, is, the, weather, like|Garbage])):-
+	Garbage \== [],
+	!,
+	format('Retrying with the weather model...\n', []),
+	retry_last_utterance(weather, NewTokens, Confidence),
+	writeln(NewTokens-Confidence).
 
 effect_command(parse_tree([what, is, the, weather, like])):-
 	!,

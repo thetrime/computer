@@ -28,6 +28,15 @@ static void log_cb(void* ignored, err_lvl_t level, const char* format, ...)
    
 }
 
+static void install_grammar(const char* name, const char* model)
+{
+   char* filename = PL_malloc(strlen(model) + 4);
+   strcpy(filename, model);
+   strcat(filename, ".lm");
+   ps_set_lm_file(ps, name, filename);
+   PL_free(filename);
+}
+
 static
 int tokenize(const char* input, term_t Tokens)
 {
@@ -67,7 +76,8 @@ foreign_t wait_for_keyword(term_t Keyword)
    char* keyword;
    int32 score;
    assert(PL_get_atom_chars(Keyword, &keyword));
-   ps_set_search(ps, "kws");   
+   ps_set_search(ps, "kws");
+   ps_load_dict(ps, "default.dic", NULL, NULL);
    int rv = ps_start_utt(ps);
    Sdprintf("Ready!\n");
    assert(ad_start_rec(microphone) >= 0);
@@ -93,18 +103,49 @@ foreign_t wait_for_keyword(term_t Keyword)
    PL_fail;
 }
 
+foreign_t retry_last_utterance(term_t Model, term_t Tokens, term_t Score)
+{
+   char* model;
+   assert(PL_get_atom_chars(Model, &model));
+   FILE* retry_buffer = fopen("/tmp/retry.raw", "rb");
+   int16 buffer[BUFSIZE];
+   int32 score;
+   int rv, rc;
+   char const *hypothesis;
+
+   // FIXME: This is obviously terrible
+   install_grammar("retry", model);
+   ps_set_search(ps, "retry");
+   ps_load_dict(ps, "weather.dic", NULL, NULL);
+   rv = ps_start_utt(ps);   
+   while (!feof(retry_buffer))
+   {
+      size_t samples_read;
+      samples_read = fread(buffer, 2, BUFSIZE, retry_buffer);
+      ps_process_raw(ps, buffer, samples_read, FALSE, FALSE);
+   }
+   fclose(retry_buffer);
+   rv = ps_end_utt(ps);
+   hypothesis = ps_get_hyp(ps, &score);
+   Sdprintf("*** utterance detected. Tokenizing...\n");
+   rc = tokenize(hypothesis, Tokens);
+   Sdprintf("*** tokenzied. Probability is %d, score is %d\n", ps_get_prob(ps), score);
+   return PL_unify_integer(Score, score);
+}
+
 foreign_t listen_for_utterance(term_t Tokens, term_t Score)
 {
    int16 buffer[BUFSIZE];
    char const *hypothesis;
    int32 score;
    int rc;
-   ps_set_search(ps, "grammar");
+   assert(ad_start_rec(microphone) >= 0);   
+   ps_set_search(ps, "default");
    int rv = ps_start_utt(ps);   
    int started_speaking = 0;
    // This file can be played back using a command like: aplay -f S16_LE -r 16000 /tmp/retry.raw 
    FILE* retry_buffer = fopen("/tmp/retry.raw", "wb");
-   assert(ad_start_rec(microphone) >= 0);   
+   Sdprintf("Listening now...\n");
    while (1)
    {
       int32 samples_read = ad_read(microphone, buffer, BUFSIZE);
@@ -148,39 +189,29 @@ foreign_t init_sphinx(term_t Model, term_t Name, term_t Threshold)
    assert(PL_get_atom_chars(Name, &name));
    assert(PL_get_atom_chars(Model, &model));
    assert(PL_get_float(Threshold, &threshold));
-   snprintf(threshold_string, 128, "%f", threshold);
+   snprintf(threshold_string, 128, "%g", threshold);
    
    /* Upper-case the name */
    char* name_uc = PL_malloc(strlen(name));
+   name_uc[strlen(name)] = '\0';
    for (char* source = name, *dest = name_uc; *source; source++, dest++)
       *dest = toupper(*source);
-   Sdprintf("Hello %s\n", name_uc);
-
    
-   char* dictionary = PL_malloc(strlen(model) + 5);
-   strcpy(dictionary, model);
-   strcat(dictionary, ".dic");
-
-   char* grammar = PL_malloc(strlen(model) + 3);
-   strcpy(grammar, model);
-   strcat(grammar, ".lm");
-
+   Sdprintf("Hello, my name is %s\n", name_uc);
    /* initialize CMU Sphinx */
-   err_set_callback(log_cb, NULL);   
+//   err_set_callback(log_cb, NULL);   
    cmd_ln_t *config;
    config = cmd_ln_init(NULL, ps_args(), TRUE,
 			"-hmm", MODELDIR "/en-us/en-us",
-			"-dict", dictionary,
+//			"-dict", "master_dictionary",
 			"-kws_threshold", threshold_string,
 			NULL);
-   Sdprintf("Here\n");
-   PL_free(dictionary);
    assert(config != NULL);
    ps = ps_init(config);
 
    ps_set_keyphrase(ps, "kws", name_uc);
-   ps_set_lm_file(ps, "grammar", grammar);
-   PL_free(grammar);
+   ps_load_dict(ps, "default.dic", NULL, NULL);
+   install_grammar("default", model);
    PL_free(name_uc);
    assert(ps != NULL);
 
@@ -197,5 +228,6 @@ install_t install_sphinx()
 {
    PL_register_foreign("wait_for_keyword", 1, wait_for_keyword, 0);
    PL_register_foreign("listen_for_utterance", 2, listen_for_utterance, 0);
+   PL_register_foreign("retry_last_utterance", 3, retry_last_utterance, 0);
    PL_register_foreign("init_sphinx", 3, init_sphinx, 0);
 }
