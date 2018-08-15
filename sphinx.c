@@ -1,5 +1,6 @@
 #include <pocketsphinx.h>
 #include <sphinxbase/ad.h>
+#include <sphinxbase/err.h>
 #include <assert.h>
 #include <ctype.h>
 #include <SWI-Prolog.h>
@@ -20,6 +21,11 @@ sleep_msec(int32 ms)
     tmo.tv_sec = 0;
     tmo.tv_usec = ms * 1000;
     select(0, NULL, NULL, NULL, &tmo);
+}
+
+static void log_cb(void* ignored, err_lvl_t level, const char* format, ...)
+{
+   
 }
 
 static
@@ -64,6 +70,7 @@ foreign_t wait_for_keyword(term_t Keyword)
    ps_set_search(ps, "kws");   
    int rv = ps_start_utt(ps);
    Sdprintf("Ready!\n");
+   assert(ad_start_rec(microphone) >= 0);
    while (1)
    {
       int32 bytes_read = ad_read(microphone, buffer, BUFSIZE);
@@ -74,6 +81,7 @@ foreign_t wait_for_keyword(term_t Keyword)
       {
            ps_end_utt(ps);
 	   Sdprintf("*** Keyword detected!\n");
+	   assert(ad_stop_rec(microphone) >= 0);   
 	   PL_succeed;
       }
       //Sdprintf("Heard something in those %d bytes, but it was not %s (%s)\n", bytes_read, keyword, hypothesis);
@@ -81,6 +89,7 @@ foreign_t wait_for_keyword(term_t Keyword)
    }
    // End of buffer but no keyword detected
    Sdprintf("failed to find keyword\n");
+   assert(ad_stop_rec(microphone) >= 0);   
    PL_fail;
 }
 
@@ -95,6 +104,7 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
    int started_speaking = 0;
    // This file can be played back using a command like: aplay -f S16_LE -r 16000 /tmp/retry.raw 
    FILE* retry_buffer = fopen("/tmp/retry.raw", "wb");
+   assert(ad_start_rec(microphone) >= 0);   
    while (1)
    {
       int32 samples_read = ad_read(microphone, buffer, BUFSIZE);
@@ -125,15 +135,20 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
    Sdprintf("*** utterance detected. Tokenizing...\n");
    rc = tokenize(hypothesis, Tokens);
    Sdprintf("*** tokenzied. Probability is %d, score is %d\n", ps_get_prob(ps), score);
+   assert(ad_stop_rec(microphone) >= 0);   
    return PL_unify_integer(Score, score);
 }
 
-foreign_t init_sphinx(term_t Model, term_t Name)
+foreign_t init_sphinx(term_t Model, term_t Name, term_t Threshold)
 {
    char* name;
    char* model;
+   double threshold;
+   char threshold_string[128];
    assert(PL_get_atom_chars(Name, &name));
    assert(PL_get_atom_chars(Model, &model));
+   assert(PL_get_float(Threshold, &threshold));
+   snprintf(threshold_string, 128, "%f", threshold);
    
    /* Upper-case the name */
    char* name_uc = PL_malloc(strlen(name));
@@ -150,14 +165,15 @@ foreign_t init_sphinx(term_t Model, term_t Name)
    strcpy(grammar, model);
    strcat(grammar, ".lm");
 
-   Sdprintf("ohai %s \n", dictionary);
    /* initialize CMU Sphinx */
+   err_set_callback(log_cb, NULL);   
    cmd_ln_t *config;
    config = cmd_ln_init(NULL, ps_args(), TRUE,
 			"-hmm", MODELDIR "/en-us/en-us",
 			"-dict", dictionary,
-			"-kws_threshold", "1e-80",
+			"-kws_threshold", threshold_string,
 			NULL);
+   Sdprintf("Here\n");
    PL_free(dictionary);
    assert(config != NULL);
    ps = ps_init(config);
@@ -171,7 +187,7 @@ foreign_t init_sphinx(term_t Model, term_t Name)
    microphone = ad_open_dev("plughw:1", 16000);
    assert(microphone != NULL);
 
-   assert(ad_start_rec(microphone) >= 0);   
+   
    // FIXME: We do not free the cmd_ln anywhere. Might be OK for continuous usage
    // FIXME: This cmd_ln_* stuff is deprecated in favour of a re-entrant API
    PL_succeed;
@@ -181,5 +197,5 @@ install_t install_sphinx()
 {
    PL_register_foreign("wait_for_keyword", 1, wait_for_keyword, 0);
    PL_register_foreign("listen_for_utterance", 2, listen_for_utterance, 0);
-   PL_register_foreign("init_sphinx", 2, init_sphinx, 0);
+   PL_register_foreign("init_sphinx", 3, init_sphinx, 0);
 }
