@@ -1,4 +1,4 @@
 *~
 .#*
-sphinx.o
-sphinx.so
+*.o
+*.so
