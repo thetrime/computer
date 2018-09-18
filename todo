@@ -5,6 +5,7 @@
    * Obviously this won't stop someone butting in - if I say 'computer' and an adversary says 'order 3 tonnes of creamed corn' then we're in trouble. 
 * Using multiple language models
    * Record the utterance to disk in a temporary file (done)
+     * The recording is always slightly truncated. Rather than stop/starting the mic I really want to FLUSH the input
    * Have a go, then optionally re-parse the temp data using partial information. For example, if the utterance starts 'what is the weather like in ' and then we get garbage, retry using the model that has lots of city names in it
       * A prolog API for this would be ideal
 * Responding

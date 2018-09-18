@@ -10,20 +10,22 @@
 
 :-use_foreign_library(sphinx).
 :-use_foreign_library(flite).
+:-use_module(time).
+
 
 computer:-
 	on_signal(term, _, halt),
-	init_sphinx(default, computer, 1e-30),
+	init_sphinx(default, computer, 1e-40),
 	main_loop.
 
 main_loop:-
 	wait_for_keyword(computer),
-	say('Aye, what is it now?', []),
+	say('Aye what now?', []),
 	writeln(listening),
 	listen_for_utterance(UtteranceTokens, Confidence),
 	writeln(Confidence),
 	parse_utterance(UtteranceTokens, Command),
-	effect_command(Command),
+	ignore(effect_command(Command)),
 	main_loop.
 
 effect_command(parse_tree([what, is, the, weather, like|Garbage])):-
@@ -31,7 +33,13 @@ effect_command(parse_tree([what, is, the, weather, like|Garbage])):-
 	!,
 	format('Retrying with the weather model...\n', []),
 	retry_last_utterance(weather, NewTokens, Confidence),
-	writeln(NewTokens-Confidence).
+	(NewTokens = [what, is, the, weather, like, in, Location]->
+	 format(atom(Message), 'I have no idea about the weather in ~w', [Location]),
+	 say(Message, [])
+	;otherwise->
+	 say('I dinnae catch that', [])
+	).
+	%writeln(NewTokens-Confidence).
 
 effect_command(parse_tree([what, is, the, weather, like])):-
 	!,
@@ -43,7 +51,7 @@ effect_command(parse_tree([what, the, weather, like])):-
 
 effect_command(parse_tree([add, _, to, the, shopping, list])):-
 	!,
-	say('Ah, do it yerself yeh lazy basterd', []).
+	say('Ah, do it yerself yi lazy basterd', []).
 
 effect_command(parse_tree([_, the, house])):-
 	!,
@@ -52,14 +60,13 @@ effect_command(parse_tree([_, the, house])):-
 effect_command(parse_tree([what, time, is, it])):-
 	!,
 	get_time(Time),
-	stamp_date_time(Time, date(_Year, _Month, _Day, Hour, Minute, _Second, _Offset, _TZ, _HasDST), local),
-	number_to_words(Hour, HourWords),
-	number_to_words(Minute, MinuteWords),
-	format(atom(Message), 'It is ~w ~w', [HourWords, MinuteWords]),
-	say(Message, []).
+	writeln(trying(Time)),
+	time_in_words(with_orientation, Time, Words),
+	writeln(got(Words)),
+	say(Words, []).
 
 effect_command(Command):-
-	say('What now?', []),
+	say('I did ney get that', []),
 	writeln(effect(Command)).
 
 number_to_words(N, N):-
