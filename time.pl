@@ -21,7 +21,11 @@ military_time_pronunciation(Hour, Minute, Words):-
 
 
 orientation_time_pronunciation(Hour, Minute, Words):-
-        hour_name(Hour, HourName),
+	(Hour > 12 ->
+	 H is Hour - 12
+	; H = Hour
+	),
+        hour_name(H, HourName),
         ( Hour =:= 0 ->
             Meridian = ''
         ; Hour < 12 ->
