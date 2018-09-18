@@ -2,11 +2,15 @@
 # sudo apt-get install flite1-dev
 
 SPHINX_CFLAGS=-I/opt/sphinx/include/pocketsphinx -I/opt/sphinx/include/sphinxbase -I/opt/sphinx/include
-SWI_CFLAGS=-I/opt/swi-prolog/lib/swipl-7.7.18/include
+SWI_CFLAGS=`PKG_CONFIG_PATH=/opt/swi-prolog/lib/pkgconfig/ pkg-config swipl --cflags`
 FLITE_CFLAGS=
+FFTW_CFLAGS=-I/opt/fftw/include
+TENSORFLOW_CFLAGS=-I/opt/tensorflow/include
 SPHINX_LDFLAGS=-L/opt/sphinx/lib -lpocketsphinx -lsphinxbase -lsphinxad
-SWI_LDFLAGS=-L/opt/swi-prolog/lib/swipl-7.7.18/lib/armv7l-linux -lswipl
+SWI_LDFLAGS=`PKG_CONFIG_PATH=/opt/swi-prolog/lib/pkgconfig/ pkg-config swipl --libs`
 FLITE_LDFLAGS=-L/usr/lib/arm-linux-gnueabihf -lflite_cmu_us_awb -lflite_usenglish -lflite_cmulex -lflite -lm -lasound
+TENSORFLOW_LDFLAGS=-L/opt/tensorflow/lib -ltensorflow
+FFTW_LDFLAGS=-L/opt/fftw/lib -lfftw3
 
 all:	default.lm default.dic weather.lm weather.dic sphinx.so 
 
@@ -21,6 +25,18 @@ flite.so:	flite.o
 
 flite.o:	flite.c
 	gcc -c $(FLITE_CFLAGS) $(SWI_CFLAGS) flite.c -o flite.o
+
+ibuprofen.o:	ibuprofen.c
+	gcc -g $(TENSORFLOW_CFLAGS) -c $< -o $@
+
+libuprofen.so: libuprofen.o holmes.o ibuprofen.o
+	gcc $^ $(TENSORFLOW_LDFLAGS) $(FFTW_LDFLAGS) $(SWI_LDFLAGS) -shared -o $@
+
+libuprofen.o: libuprofen.c
+	gcc -c libuprofen.c $(SWI_CFLAGS) $(CFLAGS) -o $@
+
+holmes.o: holmes.c
+	gcc -g $(FFTW_CFLAGS) -c $< -o $@
 
 %.lm %.dic: %.txt
 	$(eval ID=`curl "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run" -F "corpus=@$<" -F "formtype=simple" -sL -H "Content-Type: multipart/form-data" | grep "is the compressed" | sed -e 's@.*\(http://.*\)/TAR\(.*\).tgz".*@\1/\2@g'`)
