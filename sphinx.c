@@ -3,15 +3,19 @@
 #include <sphinxbase/err.h>
 #include <assert.h>
 #include <ctype.h>
+#include <string.h>
 #include <SWI-Prolog.h>
 #include <SWI-Stream.h>
 
 #define MODELDIR "/opt/sphinx/share/pocketsphinx/model"
+#define HMM "/en-us/en-us"
+//#define HMM "/voxforge.cd_ptm_5000"
 #define MODEL "computer"
 #define BUFSIZE 8192
 
 static ps_decoder_t *ps = NULL;
 ad_rec_t *microphone = NULL;
+static char* current_dictionary = NULL;
 
 static
 void
@@ -76,8 +80,9 @@ foreign_t wait_for_keyword(term_t Keyword)
    char* keyword;
    int32 score;
    assert(PL_get_atom_chars(Keyword, &keyword));
+   if (strcmp(current_dictionary, "default.dic") != 0)
+       ps_load_dict(ps, "default.dic", NULL, NULL);
    ps_set_search(ps, "kws");
-   ps_load_dict(ps, "default.dic", NULL, NULL);
    int rv = ps_start_utt(ps);
    Sdprintf("Ready!\n");
    assert(ad_start_rec(microphone) >= 0);
@@ -95,7 +100,7 @@ foreign_t wait_for_keyword(term_t Keyword)
 	   PL_succeed;
       }
       //Sdprintf("Heard something in those %d bytes, but it was not %s (%s)\n", bytes_read, keyword, hypothesis);
-      sleep_msec(10);
+      //sleep_msec(10);
    }
    // End of buffer but no keyword detected
    Sdprintf("failed to find keyword\n");
@@ -115,8 +120,9 @@ foreign_t retry_last_utterance(term_t Model, term_t Tokens, term_t Score)
 
    // FIXME: This is obviously terrible
    install_grammar("retry", model);
-   ps_set_search(ps, "retry");
+   ps_set_search(ps, "retry");   
    ps_load_dict(ps, "weather.dic", NULL, NULL);
+   current_dictionary = "weather.dic";
    rv = ps_start_utt(ps);   
    while (!feof(retry_buffer))
    {
@@ -143,6 +149,7 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
    ps_set_search(ps, "default");
    int rv = ps_start_utt(ps);   
    int started_speaking = 0;
+
    // This file can be played back using a command like: aplay -f S16_LE -r 16000 /tmp/retry.raw 
    FILE* retry_buffer = fopen("/tmp/retry.raw", "wb");
    Sdprintf("Listening now...\n");
@@ -162,13 +169,9 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
 	 // Looks like that is it!
 	 break;
       }
-      if (started_speaking)
-      {
-	 // Log the utterances to disk in case we want to redo the recognition later
-	 // Each sample is 16 bits, remember
-	 fwrite(buffer, samples_read, 2, retry_buffer);
-      }
-      //sleep_msec(100);
+      // Log the utterances to disk in case we want to redo the recognition later
+      // Each sample is 16 bits, remember
+      fwrite(buffer, samples_read, 2, retry_buffer);
    }
    fclose(retry_buffer);
    rv = ps_end_utt(ps);
@@ -202,15 +205,16 @@ foreign_t init_sphinx(term_t Model, term_t Name, term_t Threshold)
 //   err_set_callback(log_cb, NULL);   
    cmd_ln_t *config;
    config = cmd_ln_init(NULL, ps_args(), TRUE,
-			"-hmm", MODELDIR "/en-us/en-us",
+			"-hmm", MODELDIR HMM,
 //			"-dict", "master_dictionary",
 			"-kws_threshold", threshold_string,
 			NULL);
    assert(config != NULL);
    ps = ps_init(config);
 
-   ps_set_keyphrase(ps, "kws", name_uc);
    ps_load_dict(ps, "default.dic", NULL, NULL);
+   current_dictionary = "default.dic";
+   ps_set_keyphrase(ps, "kws", name_uc);
    install_grammar("default", model);
    PL_free(name_uc);
    assert(ps != NULL);
