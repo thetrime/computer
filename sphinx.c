@@ -224,6 +224,13 @@ foreign_t init_sphinx(term_t Model, term_t Name, term_t Threshold)
    PL_succeed;
 }
 
+int read_audio_samples(int16_t* buffer, int buffer_length)
+{
+   assert(microphone != NULL);
+   return ad_read(microphone, buffer, buffer_length);
+}
+
+
 install_t install_sphinx()
 {
    PL_register_foreign("wait_for_keyword", 1, wait_for_keyword, 0);

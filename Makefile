@@ -29,14 +29,14 @@ flite.o:	flite.c
 ibuprofen.o:	ibuprofen.c
 	gcc -g $(TENSORFLOW_CFLAGS) -c $< -o $@
 
-libuprofen.so: libuprofen.o holmes.o ibuprofen.o
-	gcc $^ $(TENSORFLOW_LDFLAGS) $(FFTW_LDFLAGS) $(SWI_LDFLAGS) -shared -o $@
+libuprofen.so: libuprofen.o holmes.o ibuprofen.o sphinx.so
+	gcc $^ $(TENSORFLOW_LDFLAGS) $(FFTW_LDFLAGS) $(SWI_LDFLAGS) -lsphinx -shared -o $@
 
 libuprofen.o: libuprofen.c
-	gcc -c libuprofen.c $(SWI_CFLAGS) $(CFLAGS) -o $@
+	gcc -c libuprofen.c $(SWI_CFLAGS) $(FFTW_CFLAGS) $(TENSORFLOW_CFLAGS) -o $@
 
 holmes.o: holmes.c
-	gcc -g $(FFTW_CFLAGS) -c $< -o $@
+	gcc -g $(FFTW_CFLAGS) $(TENSORFLOW_CFLAGS) -c $< -o $@
 
 %.lm %.dic: %.txt
 	$(eval ID=`curl "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run" -F "corpus=@$<" -F "formtype=simple" -sL -H "Content-Type: multipart/form-data" | grep "is the compressed" | sed -e 's@.*\(http://.*\)/TAR\(.*\).tgz".*@\1/\2@g'`)
