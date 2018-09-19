@@ -90,6 +90,13 @@ double process_block_int16(context_t* context, int16_t* data, int inNumPackets)
    return run_model(context->model);
 }
 
+void purge_context(context_t* context)
+{
+  memset(context->buffer, 0, sizeof(double)*WINDOW_LENGTH);
+  memset(model_data(context->model), 0, sizeof(float) * 13 * 29);
+  context->bufptr = 0;
+}
+
 
 
 double hz_to_mels(double hz)

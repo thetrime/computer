@@ -50,6 +50,7 @@ foreign_t wait_for_model(term_t Model, term_t Threshhold)
    if (PL_get_blob(Model, &data, NULL, &type) && type == &model_blob)
    {
       context_t* context = (context_t*)data;
+      purge_context(context);
       start_recording();
       while (1)
       {
@@ -57,7 +58,6 @@ foreign_t wait_for_model(term_t Model, term_t Threshhold)
          int sampleCount = read_audio_samples(samples, BUFFER_SIZE);
          assert (sampleCount >= 0);
          scores[score_ptr] = process_block_int16(context, samples, sampleCount);
-	 Sdprintf("Data: %d samples, Score: %.5f\n", sampleCount, scores[score_ptr]);
          score_ptr = (score_ptr + 1) % 3;
          if (scores[0] + scores[1] + scores[2] > 3 * threshhold)
 	 {

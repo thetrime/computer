@@ -22,6 +22,7 @@ typedef struct
 
 context_t* alloc_context(char* filename, int sample_rate);
 void free_context(context_t* context);
+void purge_context(context_t* context);
 int mfccs_from_circular_buffer(context_t* context, int start, int bufsize, float*, int outptr);
 int mfccs_from_file(const char* filename, float*);
 double process_block_double(context_t* context, double* data, int inNumPackets);

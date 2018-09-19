@@ -28,7 +28,7 @@ main_loop(Model):-
 	writeln(Confidence),
 	parse_utterance(UtteranceTokens, Command),
 	ignore(effect_command(Command)),
-	main_loop.
+	main_loop(Model).
 
 effect_command(parse_tree([what, is, the, weather, like|Garbage])):-
 	Garbage \== [],
