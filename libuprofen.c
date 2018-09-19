@@ -6,6 +6,8 @@
 
 #define BUFFER_SIZE 8192
 extern int read_audio_samples(int16_t* buffer, int buffer_length);
+extern void start_recording();
+extern void stop_recording();
 
 static int release_model(atom_t symbol)
 {
@@ -42,23 +44,31 @@ foreign_t wait_for_model(term_t Model, term_t Threshhold)
    double threshhold;
    double scores[3] = {0,0,0};
    int score_ptr = 0;
-
+   
    if (!PL_get_float(Threshhold, &threshhold))
       return PL_type_error("float", Threshhold);
    if (PL_get_blob(Model, &data, NULL, &type) && type == &model_blob)
    {
       context_t* context = (context_t*)data;
+      start_recording();
       while (1)
       {
          int16_t samples[BUFFER_SIZE];
          int sampleCount = read_audio_samples(samples, BUFFER_SIZE);
          assert (sampleCount >= 0);
          scores[score_ptr] = process_block_int16(context, samples, sampleCount);
+	 Sdprintf("Data: %d samples, Score: %.5f\n", sampleCount, scores[score_ptr]);
          score_ptr = (score_ptr + 1) % 3;
          if (scores[0] + scores[1] + scores[2] > 3 * threshhold)
+	 {
+	    stop_recording();
             PL_succeed;
+	 }
          if (PL_handle_signals() == -1)
+	 {
+	    stop_recording();
             return FALSE;
+	 }
       }
    }
    return PL_type_error("tensorflow_model", Model);

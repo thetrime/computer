@@ -9,17 +9,19 @@
 	 [computer/0]).
 
 :-use_foreign_library(sphinx).
+:-use_foreign_library(libuprofen).
 :-use_foreign_library(flite).
 :-use_module(time).
 
 
 computer:-
 	on_signal(term, _, halt),
+	load_tensorflow_model('qqq.pb', Model),
 	init_sphinx(default, computer, 1e-40),
-	main_loop.
+	main_loop(Model).
 
-main_loop:-
-	wait_for_keyword(computer),
+main_loop(Model):-
+	wait_for_model(Model, 0.9),
 	say('Aye what now?', []),
 	writeln(listening),
 	listen_for_utterance(UtteranceTokens, Confidence),
@@ -32,7 +34,7 @@ effect_command(parse_tree([what, is, the, weather, like|Garbage])):-
 	Garbage \== [],
 	!,
 	format('Retrying with the weather model...\n', []),
-	retry_last_utterance(weather, NewTokens, Confidence),
+	retry_last_utterance(weather, NewTokens, _Confidence),
 	(NewTokens = [what, is, the, weather, like, in, Location]->
 	 format(atom(Message), 'I have no idea about the weather in ~w', [Location]),
 	 say(Message, [])

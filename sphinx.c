@@ -228,6 +228,16 @@ foreign_t init_sphinx(term_t Model, term_t Name, term_t Threshold)
    PL_succeed;
 }
 
+void stop_recording()
+{
+  assert(ad_stop_rec(microphone) >= 0);   
+}
+
+void start_recording()
+{
+  assert(ad_start_rec(microphone) >= 0);
+}
+
 int read_audio_samples(int16_t* buffer, int buffer_length)
 {
    assert(microphone != NULL);
