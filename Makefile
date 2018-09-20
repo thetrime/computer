@@ -12,7 +12,7 @@ FLITE_LDFLAGS=-L/usr/lib/arm-linux-gnueabihf -lflite_cmu_us_awb -lflite_usenglis
 TENSORFLOW_LDFLAGS=-L/opt/tensorflow/lib -ltensorflow
 FFTW_LDFLAGS=`pkg-config fftw3 --libs`
 
-all:	default.lm default.dic weather.lm weather.dic sphinx.so 
+all:	default.lm default.dic weather.lm weather.dic sphinx.so libuprofen.so
 
 sphinx.so:	sphinx.o
 	gcc $(SPHINX_LDFLAGS) $(SWI_LDFLAGS) -shared sphinx.o -o sphinx.so
