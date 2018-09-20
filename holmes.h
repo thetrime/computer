@@ -9,6 +9,8 @@
 #define CHUNK_COUNT 63
 #define HOP_SIZE 800
 
+#define SCORE_COUNT 3
+
 int mfccs_from_file(const char* filename, float*);
 typedef struct
 {
@@ -18,6 +20,9 @@ typedef struct
    model_t* model;
    double buffer[WINDOW_LENGTH];
    int bufptr;
+   double score[SCORE_COUNT];
+   int score_ptr;
+   double total;
 } context_t;
 
 context_t* alloc_context(char* filename, int sample_rate);
@@ -25,5 +30,5 @@ void free_context(context_t* context);
 void purge_context(context_t* context);
 int mfccs_from_circular_buffer(context_t* context, int start, int bufsize, float*, int outptr);
 int mfccs_from_file(const char* filename, float*);
-double process_block_double(context_t* context, double* data, int inNumPackets);
-double process_block_int16(context_t* context, int16_t* data, int inNumPackets);
+int process_block_double(context_t* context, double* data, int inNumPackets, double threshhold);
+int process_block_int16(context_t* context, int16_t* data, int inNumPackets, double threshhold);

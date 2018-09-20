@@ -21,6 +21,7 @@ computer:-
 	main_loop(Model).
 
 main_loop(Model):-
+	writeln('Waiting for wake-word...'),
 	wait_for_model(Model, 0.9),
 	say('Aye what now?', []),
 	writeln(listening),

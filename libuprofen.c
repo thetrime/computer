@@ -9,6 +9,17 @@ extern int read_audio_samples(int16_t* buffer, int buffer_length);
 extern void start_recording();
 extern void stop_recording();
 
+static
+void
+sleep_msec(int ms)
+{
+    struct timeval tmo;
+    tmo.tv_sec = 0;
+    tmo.tv_usec = ms * 1000;
+    select(0, NULL, NULL, NULL, &tmo);
+}
+
+
 static int release_model(atom_t symbol)
 {
    model_t* model = PL_blob_data(symbol, NULL, NULL);
@@ -57,13 +68,13 @@ foreign_t wait_for_model(term_t Model, term_t Threshhold)
          int16_t samples[BUFFER_SIZE];
          int sampleCount = read_audio_samples(samples, BUFFER_SIZE);
          assert (sampleCount >= 0);
-         scores[score_ptr] = process_block_int16(context, samples, sampleCount);
-         score_ptr = (score_ptr + 1) % 3;
-         if (scores[0] + scores[1] + scores[2] > 3 * threshhold)
+	 //printf("Samples: %d\n", sampleCount);
+         if (process_block_int16(context, samples, sampleCount, threshhold))
 	 {
 	    stop_recording();
             PL_succeed;
 	 }
+	 sleep_msec(200);
          if (PL_handle_signals() == -1)
 	 {
 	    stop_recording();

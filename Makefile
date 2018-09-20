@@ -1,5 +1,6 @@
 # export LD_LIBRARY_PATH=/opt/sphinx/lib:/opt/swi-prolog/lib/swipl-7.7.18/lib/armv7l-linux/
 # sudo apt-get install flite1-dev libfftw3-dev
+# Installing tensorflow is a nightmare. I had to cross-compile it in a Ubuntu Docker image from my Mac. The critical files are the libtensorflow.so, libtensorflow_framework.so and c_api.h
 
 SPHINX_CFLAGS=-I/opt/sphinx/include/pocketsphinx -I/opt/sphinx/include/sphinxbase -I/opt/sphinx/include
 SWI_CFLAGS=`PKG_CONFIG_PATH=/opt/swi-prolog/lib/pkgconfig/ pkg-config swipl --cflags`

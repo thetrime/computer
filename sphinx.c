@@ -172,6 +172,13 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
       // Log the utterances to disk in case we want to redo the recognition later
       // Each sample is 16 bits, remember
       fwrite(buffer, samples_read, 2, retry_buffer);
+      if (PL_handle_signals() == -1)
+      {
+	 fclose(retry_buffer);
+	 assert(ad_stop_rec(microphone) >= 0);   
+	 return FALSE;
+      }
+
    }
    fclose(retry_buffer);
    rv = ps_end_utt(ps);

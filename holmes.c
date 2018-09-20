@@ -32,9 +32,11 @@ typedef struct
    int data_bytes;         // Number of bytes in data. Number of samples * num_channels * sample byte size
 }  wav_header_t;
 
-double process_block_double(context_t* context, double* data, int inNumPackets)
+int process_block_double(context_t* context, double* data, int inNumPackets, double threshhold)
 {
    int i = 0;
+   int base = 0;
+   double scaled_threshhold = threshhold * SCORE_COUNT;
    while (i < inNumPackets)
    {
       // Compute how many bytes would bring the buffer up to a new chunk
@@ -55,15 +57,25 @@ double process_block_double(context_t* context, double* data, int inNumPackets)
          // for now, just move the array back one, and ALWAYS write to the last spot in the tensor data stucture
          memcpy(model_data(context->model), &model_data(context->model)[13], sizeof(float)*13*28);
          mfccs_from_circular_buffer(context, context->bufptr, 1600, model_data(context->model), 28*13);
+	 context->total -= context->score[context->score_ptr];
+	 context->score[context->score_ptr] = run_model(context->model);
+	 context->total += context->score[context->score_ptr];
+	 if (context->total > scaled_threshhold)
+	   return 1;	 
+	 printf("Score: %.3f vs %.3f\n", context->total, scaled_threshhold);
       }
       i += thisChunkSize;
    }
-   return run_model(context->model);
+   return 0;
 }
 
-double process_block_int16(context_t* context, int16_t* data, int inNumPackets)
+int qqq = 0;
+
+int process_block_int16(context_t* context, int16_t* data, int inNumPackets, double threshhold)
 {
    int i = 0;
+   int base = 0;
+   double scaled_threshhold = threshhold * 3;
    while (i < inNumPackets)
    {
       // Compute how many bytes would bring the buffer up to a new chunk
@@ -73,8 +85,9 @@ double process_block_int16(context_t* context, int16_t* data, int inNumPackets)
          thisChunkSize = inNumPackets - i;
       // Copy the data in to the buffer, sample by agonizing sample, turning each one into a double
       for (int j = 0; j < thisChunkSize; j++)
-         context->buffer[context->bufptr++] = (double)data[j] / 32768.0;
+         context->buffer[context->bufptr++] = (double)data[j + base] / 32768.0;
       context->bufptr = context->bufptr % 1600;
+      base += thisChunkSize;
       if ((context->bufptr % 800) == 0)
       {
          // If bufptr is 0 then the block from 800 to 800 is ready. Otherwise the block from 0-1600 is ready
@@ -84,10 +97,20 @@ double process_block_int16(context_t* context, int16_t* data, int inNumPackets)
          // for now, just move the array back one, and ALWAYS write to the last spot in the tensor data stucture
          memcpy(model_data(context->model), &model_data(context->model)[13], sizeof(float)*13*28);
          mfccs_from_circular_buffer(context, context->bufptr, 1600, model_data(context->model), 28*13);
+	 context->total -= context->score[context->score_ptr];
+	 context->score[context->score_ptr] = run_model(context->model);
+	 context->total += context->score[context->score_ptr];
+	 context->score_ptr = (context->score_ptr + 1) % SCORE_COUNT;
+	 //printf("[%d] Score: %.3f vs %.3f (%.3f, %d)\n", qqq++, context->total, scaled_threshhold, x, thisChunkSize);
+	 if (context->total > scaled_threshhold)
+	 {
+	    printf("\n\nHIT\n");
+	    return 1;
+	 }
       }
       i += thisChunkSize;
    }
-   return run_model(context->model);
+   return 0;
 }
 
 void purge_context(context_t* context)
@@ -95,6 +118,8 @@ void purge_context(context_t* context)
   memset(context->buffer, 0, sizeof(double)*WINDOW_LENGTH);
   memset(model_data(context->model), 0, sizeof(float) * 13 * 29);
   context->bufptr = 0;
+  memset(context->score, 0, sizeof(double)*SCORE_COUNT);
+  context->total = 0;
 }
 
 
@@ -202,6 +227,10 @@ context_t* alloc_context(char* filename, int sample_rate)
    memset(f, 0, sizeof(float) * 13 * 29);
    memset(context->buffer, 0, sizeof(double)*WINDOW_LENGTH);
    context->bufptr = 0;
+   for (int i = 0; i < SCORE_COUNT; i++)
+      context->score[i] = 0;
+   context->score_ptr = 0;
+   context->total = 0;
    return context;
 }
 
