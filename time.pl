@@ -21,11 +21,13 @@ military_time_pronunciation(Hour, Minute, Words):-
 
 
 orientation_time_pronunciation(Hour, Minute, Words):-
-	(Hour > 12 ->
-	 H is Hour - 12
-	; H = Hour
+        orientation(Minute, Orientation, Hour, AdjustedHour),
+	(AdjustedHour > 12 ->
+	 H is AdjustedHour - 12
+	; H = AdjustedHour
 	),
-        hour_name(H, HourName),
+
+	hour_name(H, HourName),
         ( Hour =:= 0 ->
             Meridian = ''
         ; Hour < 12 ->
@@ -35,7 +37,7 @@ orientation_time_pronunciation(Hour, Minute, Words):-
         ; otherwise->
             Meridian = 'at night'
         ),
-        orientation(Minute, Orientation),
+
         format(atom(Words), '~w ~w ~w', [Orientation, HourName, Meridian]).
 
 
@@ -53,16 +55,19 @@ hour_name(10, ten):- !.
 hour_name(11, eleven):- !.
 hour_name(12, midday):- !.
 
-orientation(N, Orientation):-
+orientation(N, Orientation, H, Hour):-
         ( N =:= 0 ->
-            Orientation = 'exactly'
+	  Orientation = 'exactly',
+	  Hour = H
         ; N =< 30 ->
-            minute_name(N, Name),
-            format(atom(Orientation), '~w past', [Name])
+	  minute_name(N, Name),
+	  format(atom(Orientation), '~w past', [Name]),
+	  Hour = H
         ; otherwise->
-            NN is 60 - N,
-            minute_name(NN, Name),
-            format(atom(Orientation), '~w to', [Name])
+	  NN is 60 - N,
+	  minute_name(NN, Name),
+	  format(atom(Orientation), '~w to', [Name]),
+	  Hour is (H+1) mod 24
         ).
 
 minute_name(1, one):- !.
