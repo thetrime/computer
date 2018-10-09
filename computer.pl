@@ -15,6 +15,7 @@
 
 
 computer:-
+        thread_create(prolog, _, [detached(true)]),
 	on_signal(term, _, halt),
 	load_tensorflow_model('qqq.pb', Model),
 	init_sphinx(default, computer, 1e-40),
@@ -26,6 +27,7 @@ random_solution(Goal):-
         random_member(Goal, Goals).
 
 greeting('Aye, what now?').
+greeting('Ak, what is it?').
 greeting('Yeh, what is it?').
 greeting('Ah, I was asleep. What?'):-
         get_time(Time),

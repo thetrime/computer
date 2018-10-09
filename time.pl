@@ -32,7 +32,7 @@ orientation_time_pronunciation(Hour, Minute, Words):-
             Meridian = ''
         ; Hour < 12 ->
             Meridian = 'in the morning'
-        ; Hour < 18 ->
+        ; Hour < 17 ->
             Meridian = 'in the afternoon'
         ; otherwise->
             Meridian = 'at night'
