@@ -44,3 +44,8 @@ holmes.o: holmes.c
 	curl -s "$(ID).lm" -o $(basename $@).lm
 	curl -s "$(ID).dic" -o $(basename $@).dic
 #	(curl -s "$(ID).dic" -o - ; cat master_dictionary) | sort -u -o master_dictionary
+
+.PHONY: training-data
+
+training-data:
+	mkdir -p computer computer/wake-word computer/not-wake-word computer/test computer/test/wake-word computer/test/not-wake-word
