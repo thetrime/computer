@@ -104,7 +104,7 @@ int process_block_int16(context_t* context, int16_t* data, int inNumPackets, dou
 	 //printf("[%d] Score: %.3f vs %.3f (%.3f, %d)\n", qqq++, context->total, scaled_threshhold, x, thisChunkSize);
 	 if (context->total > scaled_threshhold)
 	 {
-	    printf("\n\nHIT\n");
+	    printf("\n\nHIT: %.3f\n", context->total);
 	    return 1;
 	 }
       }
