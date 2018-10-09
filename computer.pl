@@ -15,6 +15,7 @@
 
 
 computer:-
+        thread_create(prolog, _, [detached(true)]),
 	on_signal(term, _, halt),
 	load_tensorflow_model('qqq.pb', Model),
 	init_sphinx(default, computer, 1e-40),
