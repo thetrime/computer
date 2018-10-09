@@ -53,8 +53,6 @@ foreign_t wait_for_model(term_t Model, term_t Threshhold)
    PL_blob_t *type;
    void *data;
    double threshhold;
-   double scores[3] = {0,0,0};
-   int score_ptr = 0;
    
    if (!PL_get_float(Threshhold, &threshhold))
       return PL_type_error("float", Threshhold);
@@ -68,13 +66,13 @@ foreign_t wait_for_model(term_t Model, term_t Threshhold)
          int16_t samples[BUFFER_SIZE];
          int sampleCount = read_audio_samples(samples, BUFFER_SIZE);
          assert (sampleCount >= 0);
-	 //printf("Samples: %d\n", sampleCount);
+	 //printf("Samples: %d\n", sampleCount);	 
          if (process_block_int16(context, samples, sampleCount, threshhold))
 	 {
 	    stop_recording();
             PL_succeed;
 	 }
-	 sleep_msec(200);
+	 sleep_msec(300);
          if (PL_handle_signals() == -1)
 	 {
 	    stop_recording();

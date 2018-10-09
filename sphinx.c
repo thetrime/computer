@@ -152,10 +152,12 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
 
    // This file can be played back using a command like: aplay -f S16_LE -r 16000 /tmp/retry.raw 
    FILE* retry_buffer = fopen("/tmp/retry.raw", "wb");
+   int total_samples = 0;
    Sdprintf("Listening now...\n");
    while (1)
    {
       int32 samples_read = ad_read(microphone, buffer, BUFSIZE);
+      total_samples += samples_read;
       assert(samples_read >= 0);
       rv = ps_process_raw(ps, buffer, samples_read, FALSE, FALSE);
       int is_speaking_now = ps_get_in_speech(ps);
@@ -169,6 +171,11 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
 	 // Looks like that is it!
 	 break;
       }
+      else if (total_samples > 60 * 16000)
+      {
+	 // 60 second limit to avoid creating a huge retry buffer. This is ~2MB
+	 break;
+      }
       // Log the utterances to disk in case we want to redo the recognition later
       // Each sample is 16 bits, remember
       fwrite(buffer, samples_read, 2, retry_buffer);
@@ -178,6 +185,8 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
 	 assert(ad_stop_rec(microphone) >= 0);   
 	 return FALSE;
       }
+      // Sleep for a bit so we do not crowd the CPU
+      sleep_msec(100);
 
    }
    fclose(retry_buffer);
