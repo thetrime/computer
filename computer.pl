@@ -26,6 +26,7 @@ random_solution(Goal):-
         random_member(Goal, Goals).
 
 greeting('Aye, what now?').
+greeting('Ak, what is it?').
 greeting('Yeh, what is it?').
 greeting('Ah, I was asleep. What?'):-
         get_time(Time),
