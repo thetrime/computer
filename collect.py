@@ -57,10 +57,9 @@ RECORD_KEY = ' '
 EXIT_KEY_CODE = 27
 
 
-def record_until(p, should_return, args):
+def record_until(p, should_return):
     chunk_size = 1024
-    stream = p.open(format=p.get_format_from_width(args.width), channels=args.channels,
-                    rate=args.rate, input=True, frames_per_buffer=chunk_size)
+    stream = p.open(format=p.get_format_from_width(2), channels=1, rate=16000, input=True, frames_per_buffer=chunk_size)
 
     frames = []
     while not should_return():
@@ -113,11 +112,11 @@ def wait_to_continue():
             return False
 
 
-def record_until_key(p, args):
+def record_until_key(p):
     def should_return():
         return key_pressed() and stdin.read(1) == RECORD_KEY
 
-    return record_until(p, should_return, args)
+    return record_until(p, should_return)
 
 
 def _main():
@@ -134,7 +133,7 @@ def _main():
             break
 
         print('Recording...')
-        d = record_until_key(p, args)
+        d = record_until_key(p)
         name = next_name(file_label)
         save_audio(name, d)
         print('Saved as ' + name)
