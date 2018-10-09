@@ -4,6 +4,9 @@
 # Mycroft-precise. Since it is provided under the APL, this is OK so long as I explain this
 # and include their original license info
 
+# To run this you will probably need to run something like
+#    pip install pyaudio
+
 # Copyright 2018 Mycroft AI Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,9 +121,9 @@ def record_until_key(p, args):
 
 
 def _main():
-#    show_input()
+    show_input()
     file_label = input("File label (Ex. recording-##): ")
-#    hide_input()
+    hide_input()
 
     p = pyaudio.PyAudio()
 
