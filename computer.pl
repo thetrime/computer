@@ -20,10 +20,26 @@ computer:-
 	init_sphinx(default, computer, 1e-40),
 	main_loop(Model).
 
+:-meta_predicate(random_solution(0)).
+random_solution(Goal):-
+        bagof(Goal, Goal, Goals),
+        random_member(Goal, Goals).
+
+greeting('Aye, what now?').
+greeting('Yeh, what is it?').
+greeting('Ah, I was asleep. What?'):-
+        get_time(Time),
+        stamp_date_time(Time, date(_Year, _Month, _Day, Hour, _Minute, _Second, _Offset, _TZ, _HasDST), local),
+        ( Hour >= 21 -> true
+        ; Hour =< 5  -> true
+        ).
+
+
 main_loop(Model):-
-	writeln('Waiting for wake-word...'),
-	wait_for_model(Model, 0.9),
-	say('Aye what now?', []),
+        writeln('Waiting for wake-word...'),
+        wait_for_model(Model, 0.9),
+        random_solution(greeting(Greeting)),
+        say(Greeting, []),
 	writeln(listening),
 	listen_for_utterance(UtteranceTokens, Confidence),
 	writeln(Confidence),
