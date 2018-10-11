@@ -6,16 +6,7 @@
 */
 
 :-module(computer,
-         [computer/0,
-          say/2]).
-
-:-ensure_loaded(testing).
-:-use_foreign_library(sphinx).
-:-use_foreign_library(libuprofen).
-:-use_foreign_library(flite).
-:-use_module(spoken_time).
-:-use_module(schindler).
-
+         [computer/0]).
 
 computer:-
         thread_create(prolog, _, [detached(true)]),
