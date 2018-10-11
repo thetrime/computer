@@ -1,4 +1,4 @@
-:-module(time,
+:-module(spoken_time,
          [time_in_words/3]).
 
 time_in_words(with_orientation, Timestamp, Words):-

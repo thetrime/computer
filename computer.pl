@@ -12,7 +12,7 @@
 :-use_foreign_library(sphinx).
 :-use_foreign_library(libuprofen).
 :-use_foreign_library(flite).
-:-use_module(time).
+:-use_module(spoken_time).
 :-use_module(schindler).
 
 
@@ -56,7 +56,7 @@ main_loop(Model):-
         ),
 	main_loop(Model).
 
-:-multifile(effect_command/1).
+:-multifile(computer:effect_command/1).
 
 effect_command(parse_tree([what, is, the, weather, like|Garbage])):-
 	Garbage \== [],
