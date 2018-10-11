@@ -3,7 +3,7 @@
 % Schindler integration
 
 :-multifile(computer:effect_command/1).
-:-use_module(http/http_open).
+:-use_module(library(http/http_open)).
 
 computer:effect_command(parse_tree([add, Item, to, the, shopping, list])):-
         !,
