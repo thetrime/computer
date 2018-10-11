@@ -2,9 +2,9 @@
 
 % Schindler integration
 
-:-multifile(effect_command/1).
+:-multifile(computer:effect_command/1).
 
-effect_command(parse_tree([add, Item, to, the, shopping, list])):-
+computer:effect_command(parse_tree([add, Item, to, the, shopping, list])):-
         !,
         atom_codes(Item, Codes),
         setup_call_cleanup(http_open('http://schindlerx.strangled.net:8080?key=matt',
