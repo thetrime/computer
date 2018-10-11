@@ -48,7 +48,12 @@ main_loop(Model):-
 	listen_for_utterance(UtteranceTokens, Confidence),
 	writeln(Confidence),
 	parse_utterance(UtteranceTokens, Command),
-	ignore(effect_command(Command)),
+        ( effect_command(Command)->
+            true
+        ; otherwise->
+            say('I did ney get that', []),
+            writeln(effect(Command))
+        ),
 	main_loop(Model).
 
 :-multifile(effect_command/1).
@@ -85,10 +90,6 @@ effect_command(parse_tree([what, time, is, it])):-
 	time_in_words(with_orientation, Time, Words),
 	writeln(got(Words)),
 	say(Words, []).
-
-effect_command(Command):-
-	say('I did ney get that', []),
-	writeln(effect(Command)).
 
 number_to_words(N, N):-
 	N < 10, !.
