@@ -11,7 +11,7 @@ computer:effect_command(parse_tree([add, Item, to, the, shopping, list])):-
         setup_call_cleanup(http_open('http://schindlerx.strangled.net:8080?key=matt',
                                      Stream,
                                      [method(post),
-                                      post(codes('text/plain', ItemCodes))]),
+                                      post(codes('timtext/plain', Codes))]),
                            read_string(Stream, Reply, _),
                            close(Stream)),
         say(Reply, []).
