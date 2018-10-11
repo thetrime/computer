@@ -6,12 +6,14 @@
 */
 
 :-module(computer,
-	 [computer/0]).
+         [computer/0,
+          say/2]).
 
 :-use_foreign_library(sphinx).
 :-use_foreign_library(libuprofen).
 :-use_foreign_library(flite).
 :-use_module(time).
+:-use_module(schindler).
 
 
 computer:-
@@ -49,6 +51,8 @@ main_loop(Model):-
 	ignore(effect_command(Command)),
 	main_loop(Model).
 
+:-multifile(effect_command/1).
+
 effect_command(parse_tree([what, is, the, weather, like|Garbage])):-
 	Garbage \== [],
 	!,
@@ -69,10 +73,6 @@ effect_command(parse_tree([what, is, the, weather, like])):-
 effect_command(parse_tree([what, the, weather, like])):-
 	!,
 	say('Ah, well its Scotland, so its probably shite', []).
-
-effect_command(parse_tree([add, _, to, the, shopping, list])):-
-	!,
-	say('Ah, do it yerself yi lazy basterd', []).
 
 effect_command(parse_tree([_, the, house])):-
 	!,
