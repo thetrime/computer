@@ -9,7 +9,7 @@
          [computer/0,
           say/2]).
 
-:-use_module(testing).
+:-ensure_loaded(testing).
 :-use_foreign_library(sphinx).
 :-use_foreign_library(libuprofen).
 :-use_foreign_library(flite).
