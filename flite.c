@@ -7,7 +7,7 @@ static cst_voice *voice = NULL;
 
 foreign_t say(term_t Phrase, term_t Options)   
 {
-   const char* phrase;
+   char* phrase;
    cst_features *f = new_features();
 
    if (!PL_get_chars(Phrase, &phrase, CVT_ATOM | CVT_STRING | BUF_DISCARDABLE))
