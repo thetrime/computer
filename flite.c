@@ -9,9 +9,19 @@ foreign_t say(term_t Phrase, term_t Options)
 {
    const char* phrase;
    cst_features *f = new_features();
-       
-   if (!PL_get_atom_chars(Phrase, &phrase))
-      return PL_type_error("atom", Phrase);
+
+   if (PL_is_atom(Phrase))
+   {
+      if (!PL_get_atom_chars(Phrase, &phrase))
+         return PL_type_error("atom", Phrase);
+   }
+   else if (PL_is_string(Phrase))
+   {
+      if (!PL_get_string_chars(Phrase, &phrase))
+         return PL_type_error("string", Phrase);
+   }
+   else
+      return PL_type_error("atom_or_string", Phrase);
 
    //flite_feat_set_float(f, "duration_stretch", 1);
    //feat_copy_into(f, voice->features);
