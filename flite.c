@@ -53,7 +53,7 @@ foreign_t say(term_t Phrase, term_t Options)
       return PL_type_error("atom", Phrase);
    if (!parse_options(Options, &options))
       return FALSE;
-   flite_feat_set_float(f, "duration_stretch", options->stretch);
+   flite_feat_set_float(f, "duration_stretch", options.stretch);
    feat_copy_into(f, voice->features);
    delete_features(f);
    flite_text_to_speech(phrase, voice, "play");
