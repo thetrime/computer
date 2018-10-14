@@ -80,7 +80,19 @@ effect_command(parse_tree([_, the, house])):-
 	say('Do eh look like a fecking janitor to ye?', []).
 
 effect_command(parse_tree([what, time, is, it])):-
-	!,
+        !,
+        speak_time.
+
+effect_command(parse_tree([time, is, it])):-
+        !,
+        speak_time.
+
+effect_command(parse_tree([what time, is])):-
+        !,
+        speak_time.
+
+
+speak_time:-
         get_time(Time),
 	time_in_words(with_orientation, Time, Words),
 	writeln(got(Words)),
