@@ -33,7 +33,7 @@ int parse_options(term_t Options, say_options_t* options)
 
       if (name == ATOM_stretch)
       {
-         if (!PL_get_float_ex(arg, options->stretch))
+         if (!PL_get_float_ex(arg, &options->stretch))
             return FALSE;
       }
    }
