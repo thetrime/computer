@@ -30,6 +30,9 @@ greeting('Ah, I was asleep. What?'):-
         ; Hour =< 5  -> true
         ).
 
+did_not_understand('I did nay understand ye').
+did_not_understand('Speak up, I canna hear ye').
+did_not_understand('You what now?').
 
 main_loop(Model):-
         writeln('Waiting for wake-word...'),
@@ -43,7 +46,8 @@ main_loop(Model):-
         ( effect_command(Command)->
             true
         ; otherwise->
-            say('I did ney get that', []),
+            random_solution(did_not_understand(Response)),
+            say(Response, []),
             writeln(effect(Command))
         ),
 	main_loop(Model).
@@ -80,7 +84,7 @@ effect_command(parse_tree([what, time, is, it])):-
         get_time(Time),
 	time_in_words(with_orientation, Time, Words),
 	writeln(got(Words)),
-        say(Words, [stretch(0.5)]).
+        say(Words, [stretch(0.8)]).
 
 number_to_words(N, N):-
 	N < 10, !.
