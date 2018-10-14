@@ -147,6 +147,9 @@ foreign_t listen_for_utterance(term_t Tokens, term_t Score)
    int rc;
    assert(ad_start_rec(microphone) >= 0);   
    ps_set_search(ps, "default");
+   if (strcmp(current_dictionary, "default.dic") != 0)
+       ps_load_dict(ps, "default.dic", NULL, NULL);
+   current_dictionary = "default.dic";
    int rv = ps_start_utt(ps);   
    int started_speaking = 0;
 
