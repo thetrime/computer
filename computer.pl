@@ -77,11 +77,10 @@ effect_command(parse_tree([_, the, house])):-
 
 effect_command(parse_tree([what, time, is, it])):-
 	!,
-	get_time(Time),
-	writeln(trying(Time)),
+        get_time(Time),
 	time_in_words(with_orientation, Time, Words),
 	writeln(got(Words)),
-	say(Words, []).
+        say(Words, [stretch(0.5)]).
 
 number_to_words(N, N):-
 	N < 10, !.
