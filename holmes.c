@@ -8,29 +8,11 @@
 #include <float.h>
 #include <string.h>
 #include "holmes.h"
+#include "wav.h"
 
 #define FFT_SIZE 512
 #define FFT_COEFFICIENTS ((int)((FFT_SIZE / 2) + 1))
-typedef struct
-{
-   char riff_header[4];    // Contains "RIFF"
-   int wav_size;           // Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
-   char wave_header[4];    // Contains "WAVE"
 
-   // Format Header
-   char fmt_header[4];     // Contains "fmt " (includes trailing space)
-   int fmt_chunk_size;     // Should be 16 for PCM
-   short audio_format;     // Should be 1 for PCM. 3 for IEEE float
-   short num_channels;
-   int sample_rate;
-   int byte_rate;          // Number of bytes per second. sample_rate * num_channels * Bytes Per Sample
-   short sample_alignment; // num_channels * Bytes Per Sample
-   short bit_depth;        // Number of bits per sample
-    
-   // Data
-   char data_header[4];    // Contains "data"
-   int data_bytes;         // Number of bytes in data. Number of samples * num_channels * sample byte size
-}  wav_header_t;
 
 int process_block_double(context_t* context, double* data, int inNumPackets, double threshhold)
 {
@@ -69,8 +51,6 @@ int process_block_double(context_t* context, double* data, int inNumPackets, dou
    return 0;
 }
 
-int qqq = 0;
-
 int process_block_int16(context_t* context, int16_t* data, int inNumPackets, double threshhold)
 {
    int i = 0;
@@ -100,8 +80,7 @@ int process_block_int16(context_t* context, int16_t* data, int inNumPackets, dou
 	 context->total -= context->score[context->score_ptr];
 	 context->score[context->score_ptr] = run_model(context->model);
 	 context->total += context->score[context->score_ptr];
-	 context->score_ptr = (context->score_ptr + 1) % SCORE_COUNT;
-	 //printf("[%d] Score: %.3f vs %.3f (%.3f, %d)\n", qqq++, context->total, scaled_threshhold, x, thisChunkSize);
+         context->score_ptr = (context->score_ptr + 1) % SCORE_COUNT;
 	 if (context->total > scaled_threshhold)
 	 {
 	    printf("\n\nHIT: %.3f\n", context->total);
