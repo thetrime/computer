@@ -78,7 +78,9 @@ static void save_activation()
    memcpy(&header.data_header, "data", 4);
    header.data_bytes = 16000 * 3 * 1 * sizeof(int16_t);
    fwrite(&header, sizeof(wav_header_t), 1, fd);
+   Sdprintf("Writing %d records from %d\n", (16000 * 3) - buffer_ptr, buffer_ptr);
    fwrite(&buffer[buffer_ptr], sizeof(int16_t), (16000 * 3) - buffer_ptr, fd);
+   Sdprintf("Writing %d records from the start\n", buffer_ptr);
    fwrite(&buffer, sizeof(int16_t), buffer_ptr, fd);
    fclose(fd);
 }
