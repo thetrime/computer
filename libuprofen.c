@@ -60,7 +60,7 @@ static void save_activation()
 
    time(&current_time);
    tm_info = localtime(&current_time);
-   strftime(filename, 1024, "/tmp/activation-%Y-%m-%d %H:%M:%S.wav", tm_info);
+   strftime(filename, 1024, "/tmp/activation-%Y%m%d_%H%M%S.wav", tm_info);
    FILE* fd = fopen(filename, "wb");
    assert(fd != NULL);
    wav_header_t header;
