@@ -2,6 +2,7 @@
 #include <SWI-Stream.h>
 #include <assert.h>
 #include <string.h>
+#include <time.h>
 #include "holmes.h"
 #include "wav.h"
 
