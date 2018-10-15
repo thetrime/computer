@@ -55,13 +55,13 @@ static int buffer_ptr = 0;
 static void save_activation()
 {
    time_t current_time;
-   char buffer[1024];
+   char filename[1024];
    struct tm* tm_info;
 
    time(&current_time);
    tm_info = localtime(&current_time);
-   strftime(buffer, 1024, "/tmp/activation-%Y-%m-%d %H:%M:%S.wav", tm_info);
-   FILE* fd = fopen(buffer, "wb");
+   strftime(filename, 1024, "/tmp/activation-%Y-%m-%d %H:%M:%S.wav", tm_info);
+   FILE* fd = fopen(filename, "wb");
    assert(fd != NULL);
    wav_header_t header;
    memcpy(&header.riff_header, "RIFF", 4);
@@ -78,9 +78,7 @@ static void save_activation()
    memcpy(&header.data_header, "data", 4);
    header.data_bytes = 16000 * 3 * 1 * sizeof(int16_t);
    fwrite(&header, sizeof(wav_header_t), 1, fd);
-   Sdprintf("Writing %d records from %d\n", (16000 * 3) - buffer_ptr, buffer_ptr);
    fwrite(&buffer[buffer_ptr], sizeof(int16_t), (16000 * 3) - buffer_ptr, fd);
-   Sdprintf("Writing %d records from the start\n", buffer_ptr);
    fwrite(buffer, sizeof(int16_t), buffer_ptr, fd);
    fclose(fd);
 }
