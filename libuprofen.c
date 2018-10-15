@@ -81,7 +81,7 @@ static void save_activation()
    Sdprintf("Writing %d records from %d\n", (16000 * 3) - buffer_ptr, buffer_ptr);
    fwrite(&buffer[buffer_ptr], sizeof(int16_t), (16000 * 3) - buffer_ptr, fd);
    Sdprintf("Writing %d records from the start\n", buffer_ptr);
-   fwrite(&buffer, sizeof(int16_t), buffer_ptr, fd);
+   fwrite(buffer, sizeof(int16_t), buffer_ptr, fd);
    fclose(fd);
 }
 
